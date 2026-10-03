@@ -1769,3 +1769,330 @@ body {
     min-width: 80px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   COMMUNITY JOINING STEP STYLES (STEP 5)
+   ═══════════════════════════════════════════════════════════ */
+.community-join-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 12px;
+}
+
+.community-hero-card {
+  background: linear-gradient(135deg, #0A1628 0%, #16285A 60%, #1A50BF 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(10, 22, 40, 0.18);
+}
+
+.community-hero-card::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.community-group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+.community-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.community-hero-desc {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  max-width: 580px;
+  margin: 0 auto 20px;
+}
+
+.community-whatsapp-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #25D366;
+  color: #ffffff;
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding: 15px 32px;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.community-whatsapp-cta:hover {
+  transform: translateY(-2px);
+  background: #20bd5a;
+  box-shadow: 0 10px 28px rgba(37, 211, 102, 0.55);
+  color: #fff;
+}
+
+.community-whatsapp-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.community-cta-note {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 12px;
+}
+
+/* Choices Section */
+.community-status-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.section-instruction-header {
+  margin-bottom: 16px;
+}
+
+.section-instruction-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-instruction-sub {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.community-choices-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 620px) {
+  .community-choices-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.community-choice-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg-muted);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all var(--t-normal);
+  user-select: none;
+}
+
+.community-choice-card:hover {
+  border-color: var(--blue);
+  background: var(--blue-light);
+  transform: translateY(-1px);
+}
+
+.community-choice-card.selected {
+  border-color: var(--blue);
+  background: #EBF2FE;
+  box-shadow: 0 4px 14px rgba(26, 80, 191, 0.15);
+}
+
+.community-choice-card input[type="radio"],
+.community-choice-card input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-checkbox-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--border-input);
+  background: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-fast);
+}
+
+.community-choice-card.selected .choice-checkbox-box {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.choice-checkbox-box::after {
+  content: "";
+  display: none;
+  width: 6px;
+  height: 11px;
+  border: solid white;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.community-choice-card.selected .choice-checkbox-box::after {
+  display: block;
+}
+
+.choice-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.choice-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.community-choice-card.selected .choice-title {
+  color: var(--blue);
+}
+
+.choice-desc {
+  font-size: 0.81rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Consent Box */
+.consent-box-wrap {
+  background: #FAF8F2;
+  border: 1.5px dashed var(--gold-border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  transition: all var(--t-normal);
+}
+
+.consent-box-wrap:hover {
+  background: #FDFBF6;
+  border-color: var(--gold);
+}
+
+.consent-box-wrap.consent-checked {
+  background: #F8FBF8;
+  border-color: var(--status-success);
+  border-style: solid;
+}
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.consent-checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 2px solid #A89568;
+  background: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-fast);
+}
+
+.consent-label input:checked + .consent-checkbox-custom {
+  background: var(--status-success);
+  border-color: var(--status-success);
+}
+
+.consent-label input:checked + .consent-checkbox-custom::after {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.consent-text {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  text-align: left;
+}
+
+.consent-text strong {
+  color: var(--navy);
+}
+
+/* Validation Highlights */
+.community-choices-grid.error-highlight {
+  outline: 2px solid var(--status-error);
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
+  animation: shake 0.4s ease;
+}
+
+.consent-box-wrap.error-highlight {
+  border-color: var(--status-error) !important;
+  border-style: solid !important;
+  background: #FEF2F2 !important;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}

@@ -15,7 +15,6 @@ window.DHRUVA_CONFIG = {
   club: {
     name: "Dhruva Club",
     tagline: "An Official Student Club of PVGCOET",
-    badge: "PQ-IQ-SQ Assessment",
     badge: "Official Assessment 2026",
     logoPath: "assets/logo.png",
 
@@ -539,6 +538,29 @@ window.DHRUVA_CONFIG = {
           optionScores: [3, 2.5, 5, 4, 3.5]
         }
       ]
+    },
+    {
+      id: "community_joining",
+      title: "Official WhatsApp Community Joining",
+      subtitle: "Join the official Dhruva Club student community to receive mentor guidance, workshop updates, and exclusive resources.",
+      category: "Community Joining",
+      isCommunityJoining: true,
+      cardTitle: "Dhruva Club Official Student Community",
+      cardDescription: "Be a part of an empowering community of students committed to character, competence, and holistic growth.",
+      buttonLabel: "Join Official WhatsApp Group",
+      choices: [
+        {
+          id: "joined",
+          label: "Yes, I have joined",
+          desc: "I have clicked the button above and joined the official WhatsApp group."
+        },
+        {
+          id: "join_later",
+          label: "I will join later on",
+          desc: "I will join the community group later using the link on my results dashboard."
+        }
+      ],
+      consentText: "I confirm my selection above and agree to proceed to my assessment score evaluation."
     }
   ],
 
@@ -856,3 +878,10 @@ window.DHRUVA_CONFIG = {
     }
   }
 };
+
+// Keep the assessment concise while preserving the configured question order.
+window.DHRUVA_CONFIG.steps
+  .filter(step => ["pq", "iq", "sq"].includes(step.dimension))
+  .forEach(step => {
+    step.questions = step.questions.slice(0, 5);
+  });

@@ -241,6 +241,88 @@
       margin: 0 0 22px;
       line-height: 1.6;
     }
+    .club-gallery {
+      margin: 0 0 28px;
+    }
+    .club-gallery-title {
+      margin: 0 0 14px;
+      color: var(--text-primary, #0A1628);
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    .club-gallery-slideshow {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #0A1628;
+    }
+    .club-gallery-slide {
+      margin: 0;
+    }
+    .club-gallery-slide[hidden] {
+      display: none;
+    }
+    .club-gallery-slide img {
+      display: block;
+      width: 100%;
+      height: clamp(240px, 48vw, 420px);
+      object-fit: cover;
+    }
+    .club-gallery-caption {
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.85rem;
+      text-align: center;
+      background: linear-gradient(transparent, rgba(10,22,40,0.96));
+    }
+    .club-gallery-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .club-gallery-arrow,
+    .club-gallery-dot {
+      border: 0;
+      cursor: pointer;
+    }
+    .club-gallery-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--primary, #1A50BF);
+      font-size: 1.25rem;
+    }
+    .club-gallery-arrow:focus-visible,
+    .club-gallery-dot:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+    .club-gallery-position {
+      min-width: 44px;
+      color: var(--text-secondary, #64748b);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .club-gallery-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .club-gallery-dot {
+      width: 9px;
+      height: 9px;
+      padding: 0;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+    .club-gallery-dot[aria-current="true"] {
+      background: var(--primary, #1A50BF);
+      transform: scale(1.25);
+    }
     .celebration-icon {
       display: flex;
       align-items: center;
@@ -270,6 +352,7 @@
       .score-badge-value { font-size: 1.4rem; }
       .cta-box { padding: 22px 16px; }
       .cta-box h3 { font-size: 1.1rem; }
+      .club-gallery-slide img { height: 240px; }
     }
   </style>
 </head>
@@ -418,6 +501,13 @@
 
       const ctaTier = getCTATier(totalScore);
 
+      const hasJoined = sessionData?.whatsappStatus === "joined";
+      const ctaHeading = hasJoined ? "Welcome to the Dhruva Club Community!" : ctaTier.heading;
+      const ctaBody = hasJoined
+        ? `${studentName ? studentName + ", you" : "You"} have confirmed joining the official WhatsApp community group. Stay connected for upcoming workshop invitations, mentor interactions, and your personal quotient development roadmap.`
+        : ctaTier.body;
+      const ctaBtnText = hasJoined ? "Open WhatsApp Community Group" : ctaTier.buttonText;
+
       // ── Personalized greeting ──
       const personalizedGreeting = studentName
         ? `Congratulations, <strong>${studentName}</strong>! Here is your personalized PQ · IQ · SQ score analysis.`
@@ -456,6 +546,33 @@
         <h2 class="result-title">${resultConf.title || "Assessment Submitted!"}</h2>
         <p class="result-greeting">${personalizedGreeting}</p>
 
+        <section class="club-gallery" aria-label="Dhruva Club photo gallery">
+          <h3 class="club-gallery-title">A glimpse of Dhruva Club</h3>
+          <div class="club-gallery-slideshow" id="clubGallerySlideshow" aria-roledescription="carousel">
+            <figure class="club-gallery-slide">
+              <img src="assets/club-gallery-hike.png" alt="Dhruva Club students enjoying a group hike" loading="lazy">
+              <figcaption class="club-gallery-caption">Growing together through shared experiences</figcaption>
+            </figure>
+            <figure class="club-gallery-slide" hidden>
+              <img src="assets/club-gallery-fields.png" alt="Green fields during a Dhruva Club outing" loading="lazy">
+              <figcaption class="club-gallery-caption">Finding space to reflect and recharge</figcaption>
+            </figure>
+            <figure class="club-gallery-slide" hidden>
+              <img src="assets/club-gallery-team.png" alt="Dhruva Club members together outdoors" loading="lazy">
+              <figcaption class="club-gallery-caption">The Dhruva Club community</figcaption>
+            </figure>
+          </div>
+          <div class="club-gallery-controls">
+            <button type="button" class="club-gallery-arrow" id="galleryPrevious" aria-label="Previous photo">‹</button>
+            <span class="club-gallery-position" id="galleryPosition" aria-live="polite">1 / 3</span>
+            <button type="button" class="club-gallery-arrow" id="galleryNext" aria-label="Next photo">›</button>
+          </div>
+          <div class="club-gallery-dots" id="clubGalleryDots" aria-label="Choose a photo"></div>
+          <div style="text-align:center;margin-top:10px;">
+            <button type="button" class="btn btn-secondary" id="galleryPause" aria-pressed="false">Pause slideshow</button>
+          </div>
+        </section>
+
         ${overallChips}
 
         <!-- 3-Part Score Cards with Bullet Analysis -->
@@ -467,17 +584,72 @@
 
         <!-- Dynamic Combined CTA -->
         <div class="cta-box">
-          <div class="cta-box-badge">Community Invitation</div>
-          <h3>${ctaTier.heading}</h3>
-          <p>${ctaTier.body}</p>
+          <div class="cta-box-badge">${hasJoined ? "Community Member" : "Community Invitation"}</div>
+          <h3>${ctaHeading}</h3>
+          <p>${ctaBody}</p>
           <a href="${targetLink}" id="whatsappRedirectBtn" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
             <svg class="whatsapp-icon" viewBox="0 0 24 24">
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
             </svg>
-            <span>${ctaTier.buttonText}</span>
+            <span>${ctaBtnText}</span>
           </a>
         </div>
       `;
+
+      const gallery = document.getElementById("clubGallerySlideshow");
+      if (gallery) {
+        const slides = Array.from(gallery.querySelectorAll(".club-gallery-slide"));
+        const dotsContainer = document.getElementById("clubGalleryDots");
+        const position = document.getElementById("galleryPosition");
+        const pauseButton = document.getElementById("galleryPause");
+        let activeSlide = 0;
+        let timer;
+        let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function showSlide(index) {
+          activeSlide = (index + slides.length) % slides.length;
+          slides.forEach((slide, slideIndex) => {
+            slide.hidden = slideIndex !== activeSlide;
+          });
+          Array.from(dotsContainer.children).forEach((dot, dotIndex) => {
+            dot.setAttribute("aria-current", String(dotIndex === activeSlide));
+          });
+          position.textContent = `${activeSlide + 1} / ${slides.length}`;
+        }
+
+        slides.forEach((_, index) => {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "club-gallery-dot";
+          dot.setAttribute("aria-label", `Show photo ${index + 1}`);
+          dot.addEventListener("click", () => showSlide(index));
+          dotsContainer.appendChild(dot);
+        });
+
+        function updateAutoplay() {
+          window.clearInterval(timer);
+          if (!paused) {
+            timer = window.setInterval(() => showSlide(activeSlide + 1), 5000);
+          }
+          pauseButton.textContent = paused ? "Play slideshow" : "Pause slideshow";
+          pauseButton.setAttribute("aria-pressed", String(paused));
+        }
+
+        document.getElementById("galleryPrevious").addEventListener("click", () => showSlide(activeSlide - 1));
+        document.getElementById("galleryNext").addEventListener("click", () => showSlide(activeSlide + 1));
+        pauseButton.addEventListener("click", () => {
+          paused = !paused;
+          updateAutoplay();
+        });
+        gallery.addEventListener("mouseenter", () => window.clearInterval(timer));
+        gallery.addEventListener("mouseleave", updateAutoplay);
+        gallery.addEventListener("focusin", () => window.clearInterval(timer));
+        gallery.addEventListener("focusout", event => {
+          if (!gallery.contains(event.relatedTarget)) updateAutoplay();
+        });
+        showSlide(0);
+        updateAutoplay();
+      }
 
       if (resultBadge) resultBadge.textContent = resultConf.badge || "Evaluation Complete";
     });

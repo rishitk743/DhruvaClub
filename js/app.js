@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const shortName = step.isPersonalDetails
         ? "Profile"
-        : (step.dimension ? step.dimension.toUpperCase() : `Part ${idx}`);
+        : (step.isCommunityJoining ? "Community" : (step.dimension ? step.dimension.toUpperCase() : `Part ${idx}`));
 
       dotItem.innerHTML = `
         <div class="step-dot">${idx + 1}</div>
@@ -129,7 +129,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const isLastStep = currentStepIndex === totalSteps - 1;
       const btnText = nextBtn.querySelector(".btn-text");
       if (btnText) {
-        btnText.textContent = isLastStep ? "Submit Assessment" : "Continue";
+        if (currentStepIndex === 0) {
+          btnText.textContent = "Save & Continue";
+        } else if (isLastStep) {
+          btnText.textContent = "Submit & View Results";
+        } else {
+          btnText.textContent = "Continue";
+        }
       }
     }
   }
@@ -260,6 +266,59 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
         });
         bodyHtml += `</div>`;
+      } else if (step.isCommunityJoining) {
+        // Render WhatsApp Community Joining Card & Confirmation Checkboxes
+        bodyHtml = `
+          <div class="community-join-container">
+            <div class="community-hero-card">
+              <div class="community-group-badge" id="communityGenderBadge">Official Student Community</div>
+              <h3 class="community-hero-title">${step.cardTitle || "Dhruva Club Official Student Community"}</h3>
+              <p class="community-hero-desc">
+                ${step.cardDescription || "Be a part of an empowering community of students committed to character, competence, and holistic growth."}
+              </p>
+              <a href="#" id="communityWhatsAppBtn" target="_blank" rel="noopener noreferrer" class="community-whatsapp-cta">
+                <svg class="community-whatsapp-icon" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                <span>${step.buttonLabel || "Join Official WhatsApp Group"}</span>
+              </a>
+              <p class="community-cta-note">Click the button above to join before making your selection below.</p>
+            </div>
+
+            <div class="community-status-section">
+              <div class="section-instruction-header">
+                <h4 class="section-instruction-title">
+                  <span>📌</span>
+                  <span>Confirm Your Community Status</span>
+                </h4>
+                <p class="section-instruction-sub">Please select one option to record your membership preference:</p>
+              </div>
+
+              <div class="community-choices-grid" id="communityChoicesGrid">
+                ${(step.choices || []).map(choice => `
+                  <div class="community-choice-card" id="choice-${choice.id}-card" data-choice="${choice.id}">
+                    <input type="radio" name="whatsapp_status" value="${choice.id}">
+                    <div class="choice-checkbox-box"></div>
+                    <div class="choice-text-wrap">
+                      <span class="choice-title">${choice.label}</span>
+                      <span class="choice-desc">${choice.desc}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="consent-box-wrap" id="communityConsentWrap">
+                <label class="consent-label" for="communityConsentInput">
+                  <input type="checkbox" id="communityConsentInput" class="consent-native-checkbox" style="position:absolute;opacity:0;pointer-events:none;">
+                  <div class="consent-checkbox-custom"></div>
+                  <span class="consent-text">
+                    <strong>Confirm Selection:</strong> ${step.consentText || "I confirm my selection above and agree to proceed to my assessment score evaluation."}
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       stepView.innerHTML = headerHtml + bodyHtml;
@@ -322,15 +381,71 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Input blur / input change clearing errors
-    const inputs = document.querySelectorAll(".form-input, .form-select");
-    inputs.forEach(input => {
-      input.addEventListener("input", () => {
-        input.classList.remove("error");
-        const err = document.getElementById(`error-${input.name}`);
-        if (err) err.classList.remove("visible");
+    // Community choice card selection (mutually exclusive)
+    const communityChoiceCards = document.querySelectorAll(".community-choice-card");
+    communityChoiceCards.forEach(card => {
+      card.addEventListener("click", () => {
+        communityChoiceCards.forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) {
+          radio.checked = true;
+          formData.whatsappCommunityStatus = radio.value;
+        }
+        const grid = document.getElementById("communityChoicesGrid");
+        if (grid) grid.classList.remove("error-highlight");
       });
     });
+
+    // Keep the custom consent style in sync with the native checkbox state.
+    const consentWrap = document.getElementById("communityConsentWrap");
+    const consentInput = document.getElementById("communityConsentInput");
+    if (consentWrap && consentInput) {
+      consentInput.addEventListener("change", () => {
+        formData.communityConsent = consentInput.checked;
+        consentWrap.classList.toggle("consent-checked", consentInput.checked);
+        if (consentInput.checked) {
+          consentWrap.classList.remove("error-highlight");
+        }
+      });
+    }
+
+    // WhatsApp Button Click Listener - Count click, auto-select "joined", auto-check confirmation, and save to DB
+    const waBtn = document.getElementById("communityWhatsAppBtn");
+    if (waBtn) {
+      waBtn.addEventListener("click", () => {
+        formData.whatsappCommunityStatus = "joined";
+        formData.communityConsent = true;
+
+        // Auto-select "I have joined" card in UI
+        communityChoiceCards.forEach(c => c.classList.remove("selected"));
+        const joinedCard = document.getElementById("choice-joined-card");
+        if (joinedCard) {
+          joinedCard.classList.add("selected");
+          const radio = joinedCard.querySelector('input[type="radio"]');
+          if (radio) radio.checked = true;
+        }
+
+        // Auto-check confirmation checkbox in UI
+        if (consentInput) {
+          consentInput.checked = true;
+        }
+        if (consentWrap) {
+          consentWrap.classList.add("consent-checked");
+          consentWrap.classList.remove("error-highlight");
+        }
+        const choicesGrid = document.getElementById("communityChoicesGrid");
+        if (choicesGrid) choicesGrid.classList.remove("error-highlight");
+
+        // Immediately record click & joined count in Firestore
+        const subId = formData.submissionId || sessionStorage.getItem("dhruva_submission_id");
+        if (window.DhruvaBackend && window.DhruvaBackend.recordWhatsAppClick) {
+          window.DhruvaBackend.recordWhatsAppClick(subId, formData.personal);
+        }
+
+        showToast("WhatsApp group invite opened! You are marked as Joined.", "info");
+      });
+    }
   }
 
   function clearFieldError(fieldName) {
@@ -405,7 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
               formData.personal[field.name] = val;
             }
-          } else if (val && field.name === "whatsappg" && !/^[0-9]{10}$/.test(val.replace(/[^0-9]/g, ''))) {
+          } else if (val && field.name === "whatsappNumber" && !/^[0-9]{10}$/.test(val.replace(/[^0-9]/g, ''))) {
             if (field.required) {
               isValid = false;
               showFieldError(field.name, `Please enter a valid 10-digit mobile number`);
@@ -427,6 +542,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return false;
       }
+      return true;
+    } else if (currentStepConfig.isCommunityJoining) {
+      const choicesGrid = document.getElementById("communityChoicesGrid");
+      const consentWrap = document.getElementById("communityConsentWrap");
+
+      if (!formData.whatsappCommunityStatus) {
+        if (choicesGrid) {
+          choicesGrid.classList.add("error-highlight");
+          choicesGrid.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        showToast("Please select whether you have joined or will join later on.", "error");
+        return false;
+      } else {
+        if (choicesGrid) choicesGrid.classList.remove("error-highlight");
+      }
+
+      if (!formData.communityConsent) {
+        if (consentWrap) {
+          consentWrap.classList.add("error-highlight");
+          consentWrap.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        showToast("Please check the confirmation box to confirm your selection.", "error");
+        return false;
+      } else {
+        if (consentWrap) consentWrap.classList.remove("error-highlight");
+      }
+
       return true;
     } else if (currentStepConfig.questions) {
       // Validate all MCQ questions in this step
@@ -476,11 +618,36 @@ document.addEventListener("DOMContentLoaded", () => {
     currentStepIndex = newIndex;
     updateProgressUI();
 
+    // If moving to community joining step, update WhatsApp link based on student's gender
+    const targetStepConfig = config.steps[newIndex];
+    if (targetStepConfig && targetStepConfig.isCommunityJoining) {
+      updateCommunityStepDetails();
+    }
+
     // Scroll smoothly to top of form card
     const formCard = document.getElementById("formCard");
     if (formCard) {
       formCard.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+
+  function updateCommunityStepDetails() {
+    const userGender = (formData.personal.gender || "").toLowerCase();
+    const waBtn = document.getElementById("communityWhatsAppBtn");
+    const badge = document.getElementById("communityGenderBadge");
+
+    let link = config.whatsappLinks?.default || "#";
+    if (userGender === "female") {
+      link = config.whatsappLinks?.female || config.whatsappLinks?.default || "#";
+      if (badge) badge.textContent = "👩 Official Female Community Group";
+    } else if (userGender === "male") {
+      link = config.whatsappLinks?.male || config.whatsappLinks?.default || "#";
+      if (badge) badge.textContent = "👨 Official Male Community Group";
+    } else {
+      if (badge) badge.textContent = "Official Student Community Group";
+    }
+
+    if (waBtn) waBtn.href = link;
   }
 
   // ===================================================================
@@ -568,6 +735,8 @@ document.addEventListener("DOMContentLoaded", () => {
     nextBtn.disabled = true;
     prevBtn.disabled = true;
     nextBtn.classList.add("submitting");
+    const btnText = nextBtn.querySelector(".btn-text");
+    if (btnText) btnText.textContent = "Submitting Assessment...";
 
     const userGender = (formData.personal.gender || "male").toLowerCase();
     const studentName = formData.personal.fullName || "Student";
@@ -575,24 +744,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const totalScore = Math.round((computedScores.pq + computedScores.iq + computedScores.sq) / 3);
 
-    const payload = {
-      ...formData.personal,
+    const submissionId = formData.submissionId || sessionStorage.getItem("dhruva_submission_id");
+
+    // CRITICAL: Individual answers are strictly NOT stored in the database as requested
+    const updatePayload = {
+      personal: formData.personal,
+      scores: computedScores,
       totalScore,
-      timestamp: new Date().toISOString()
+      whatsappCommunityStatus: formData.whatsappCommunityStatus || "unspecified",
+      userAgent: (navigator.userAgent || "").substring(0, 500)
     };
 
-    console.log("Submitting test payload with scores:", payload);
+    console.log("Submitting completed assessment (WITHOUT answers):", updatePayload);
 
     try {
-      await window.DhruvaBackend.saveTestSubmission(payload);
+      const saveResult = await window.DhruvaBackend.updateAssessmentSubmission(submissionId, updatePayload);
+      if (!saveResult || !saveResult.success) {
+        throw new Error(saveResult && saveResult.error
+          ? saveResult.error
+          : "Assessment could not be saved to Firestore.");
+      }
 
-      // SECURITY: Encrypt session payload containing gender, studentName, and scores
-      // Stored in sessionStorage only — tampering URL does nothing.
+      // SECURITY: Encrypt session payload containing gender, studentName, scores, and whatsappStatus
       const sessionData = {
         gender: userGender,
         fullName: studentName,
         scores: computedScores,
-        totalScore
+        totalScore,
+        whatsappStatus: formData.whatsappCommunityStatus || "join_later"
       };
 
       const authToken = window.DhruvaSecurity
@@ -611,17 +790,57 @@ document.addEventListener("DOMContentLoaded", () => {
       nextBtn.disabled = false;
       prevBtn.disabled = false;
       nextBtn.classList.remove("submitting");
+      if (btnText) btnText.textContent = "Submit & View Results";
     }
   }
 
   // Next / Continue button click
-  nextBtn.addEventListener("click", () => {
-    if (currentStepIndex === totalSteps - 1) {
-      handleFormSubmit();
-    } else {
-      if (validateCurrentStep()) {
-        goToStep(currentStepIndex + 1);
+  nextBtn.addEventListener("click", async () => {
+    // Case 1: On Step 0 (Registration) - Store entry in DB immediately!
+    if (currentStepIndex === 0) {
+      if (!validateCurrentStep()) return;
+
+      // Save registration immediately to database
+      nextBtn.disabled = true;
+      nextBtn.classList.add("submitting");
+      const btnText = nextBtn.querySelector(".btn-text");
+      const originalText = btnText ? btnText.textContent : "Save & Continue";
+      if (btnText) btnText.textContent = "Saving to database...";
+
+      try {
+        const res = await window.DhruvaBackend.saveRegistration(formData.personal);
+        if (res && res.success && res.id) {
+          formData.submissionId = res.id;
+          sessionStorage.setItem("dhruva_submission_id", res.id);
+          showToast("Registration saved! Starting assessment...", "info");
+        } else {
+          console.error("Registration was not saved to the database:", res && res.error);
+          showToast(res && res.error ? res.error : "Registration could not be saved. Check your connection and try again.", "error");
+          return;
+        }
+      } catch (err) {
+        console.error("Error saving initial registration:", err);
+        showToast("Registration could not be saved. Check your connection and try again.", "error");
+        return;
+      } finally {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove("submitting");
+        if (btnText) btnText.textContent = originalText;
       }
+      goToStep(currentStepIndex + 1);
+      return;
+    }
+
+    // Case 2: On Last Step (Step 5: Community Joining) - Validate choices & submit assessment!
+    if (currentStepIndex === totalSteps - 1) {
+      if (!validateCurrentStep()) return;
+      handleFormSubmit();
+      return;
+    }
+
+    // Case 3: Quiz Steps (PQ, IQ, SQ)
+    if (validateCurrentStep()) {
+      goToStep(currentStepIndex + 1);
     }
   });
 

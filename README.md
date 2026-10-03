@@ -75,7 +75,9 @@ npx serve .
    ```
 4. In Firebase Console, go to **Firestore Database** > **Create database** (start in Test mode, or configure write permissions for the collection `dhruva_test_submissions`).
 
-*Note: Until real credentials are added, the app automatically runs in Demo Mode and logs responses to local storage and browser console without crashing.*
+*Note: If Firebase is unavailable or rejects a write, the app reports the failure and keeps the user on the registration step instead of claiming that the data was saved.*
+
+The first successful registration also creates `dhruva_test_stats/summary`. It stores registration and gender totals, `pendingStatusCount` (registrations without a confirmed community choice), `totalJoined`, `totalJoinLater`, and `notJoinedList` (names and phone numbers of participants who selected “I will join later”). Previous summary entries without a confirmed community choice are preserved in `unverifiedStatusList`; the old joined total is retained as `historicalReportedJoinedCount` instead of being presented as confirmed. Stats and the submission are saved together, and community totals change only when the assessment is submitted. The legacy summary is migrated on the next registration or assessment submission.
 
 ---
 

@@ -23,7 +23,7 @@ service cloud.firestore {
       // ───────────────────────────────────────────────────────────────────
 
       allow create: if
-        // Request must contain ONLY these fields (prevents extra data injection)
+        // Request must contain ONLY allowed submission fields
         request.resource.data.keys().hasOnly([
           'fullName',
           'email',
@@ -32,11 +32,14 @@ service cloud.firestore {
           'homeTown',
           'branch',
           'year',
+          'status',
           'answers',
           'scores',
           'totalScore',
+          'whatsappCommunityStatus',
           'timestamp',
           'submittedAt',
+          'completedAt',
           'userAgent'
         ])
 
@@ -70,84 +73,52 @@ service cloud.firestore {
         && request.resource.data.year.size() <= 50
 
         // ─────────────────────────────────────────────────────────────────
-        // GENDER VALIDATION (Only allowed values)
+        // GENDER VALIDATION
         // ─────────────────────────────────────────────────────────────────
 
         && request.resource.data.gender in ['Male', 'Female', 'Other']
 
         // ─────────────────────────────────────────────────────────────────
-        // ASSESSMENT DATA VALIDATION
+        // METADATA VALIDATION
         // ─────────────────────────────────────────────────────────────────
 
-        // answers must be a map (object)
-        && request.resource.data.answers is map
+        && request.resource.data.submittedAt is string;
 
-        // scores must contain exactly pq, iq, sq
-        && request.resource.data.scores is map
-        && request.resource.data.scores.keys().hasOnly(['pq', 'iq', 'sq'])
-
-        // Each score must be a number between 0-100
-        && request.resource.data.scores.pq is number
-        && request.resource.data.scores.pq >= 0
-        && request.resource.data.scores.pq <= 100
-        && request.resource.data.scores.iq is number
-        && request.resource.data.scores.iq >= 0
-        && request.resource.data.scores.iq <= 100
-        && request.resource.data.scores.sq is number
-        && request.resource.data.scores.sq >= 0
-        && request.resource.data.scores.sq <= 100
-
-        // ─────────────────────────────────────────────────────────────────
-        // OVERALL SCORE VALIDATION (0-100)
-        // ─────────────────────────────────────────────────────────────────
-
-        && request.resource.data.totalScore is number
-        && request.resource.data.totalScore >= 0
-        && request.resource.data.totalScore <= 100
-
-        // ─────────────────────────────────────────────────────────────────
-        // METADATA VALIDATION (Timestamps and browser info)
-        // ─────────────────────────────────────────────────────────────────
-
-        && request.resource.data.timestamp is string
-        && request.resource.data.submittedAt is string
-        && request.resource.data.userAgent is string
-        && request.resource.data.userAgent.size() > 0
-        && request.resource.data.userAgent.size() <= 500;
+      // ───────────────────────────────────────────────────────────────────
+      // ALLOW: Update (Complete assessment details after taking quiz)
+      // ───────────────────────────────────────────────────────────────────
+      allow update: if
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'answers',
+          'scores',
+          'totalScore',
+          'whatsappCommunityStatus',
+          'status',
+          'completedAt',
+          'userAgent'
+        ]);
 
       // ───────────────────────────────────────────────────────────────────
       // DENY: Read (No public access to submissions)
       // ───────────────────────────────────────────────────────────────────
-      // Students cannot view other students' responses
-      // Use Firebase Console or authenticated admin tool to view data
-      // ───────────────────────────────────────────────────────────────────
-
       allow read: if false;
-
-      // ───────────────────────────────────────────────────────────────────
-      // DENY: Update (Submissions are immutable)
-      // ───────────────────────────────────────────────────────────────────
-      // Once submitted, responses cannot be edited by public
-      // Only admin can modify via Firebase Console if needed
-      // ───────────────────────────────────────────────────────────────────
-
-      allow update: if false;
 
       // ───────────────────────────────────────────────────────────────────
       // DENY: Delete (Submissions are permanent)
       // ───────────────────────────────────────────────────────────────────
-      // Prevent accidental or malicious deletion of student data
-      // ───────────────────────────────────────────────────────────────────
-
       allow delete: if false;
+    }
+
+    // =====================================================================
+    // DHRUVA CLUB STATS SUMMARY
+    // =====================================================================
+    match /dhruva_test_stats/{docId} {
+      allow read, write: if true;
     }
 
     // =====================================================================
     // DENY ALL OTHER COLLECTIONS
     // =====================================================================
-    // Explicitly deny access to any other collection for security
-    // =====================================================================
-
     match /{document=**} {
       allow read, write: if false;
     }
