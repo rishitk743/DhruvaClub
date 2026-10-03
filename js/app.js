@@ -409,6 +409,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+
+    // WhatsApp Button Click Listener - Count click, auto-select "joined", auto-check confirmation, and save to DB
+    const waBtn = document.getElementById("communityWhatsAppBtn");
+    if (waBtn) {
+      waBtn.addEventListener("click", () => {
+        formData.whatsappCommunityStatus = "joined";
+        formData.communityConsent = true;
+
+        // Auto-select "I have joined" card in UI
+        communityChoiceCards.forEach(c => c.classList.remove("selected"));
+        const joinedCard = document.getElementById("choice-joined-card");
+        if (joinedCard) {
+          joinedCard.classList.add("selected");
+          const radio = joinedCard.querySelector('input[type="radio"]');
+          if (radio) radio.checked = true;
+        }
+
+        // Auto-check confirmation checkbox in UI
+        if (consentInput) {
+          consentInput.checked = true;
+        }
+        if (consentWrap) {
+          consentWrap.classList.add("consent-checked");
+          consentWrap.classList.remove("error-highlight");
+        }
+        const choicesGrid = document.getElementById("communityChoicesGrid");
+        if (choicesGrid) choicesGrid.classList.remove("error-highlight");
+
+        // Immediately record click & joined count in Firestore
+        const subId = formData.submissionId || sessionStorage.getItem("dhruva_submission_id");
+        if (window.DhruvaBackend && window.DhruvaBackend.recordWhatsAppClick) {
+          window.DhruvaBackend.recordWhatsAppClick(subId, formData.personal);
+        }
+
+        showToast("WhatsApp group invite opened! You are marked as Joined.", "info");
+      });
+    }
   }
 
   function clearFieldError(fieldName) {
@@ -772,13 +809,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         const res = await window.DhruvaBackend.saveRegistration(formData.personal);
-        if (res && res.success && res.id && !res.offline) {
+        if (res && res.success && res.id) {
           formData.submissionId = res.id;
           sessionStorage.setItem("dhruva_submission_id", res.id);
-          showToast("Registration saved in database! Starting assessment...", "info");
+          showToast("Registration saved! Starting assessment...", "info");
         } else {
           console.error("Registration was not saved to the database:", res && res.error);
-          showToast("Registration could not be saved. Check your connection and try again.", "error");
+          showToast(res && res.error ? res.error : "Registration could not be saved. Check your connection and try again.", "error");
           return;
         }
       } catch (err) {

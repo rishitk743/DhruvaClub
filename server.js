@@ -19,6 +19,7 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let reqPath = decodeURI(req.url.split('?')[0]);
   if (reqPath === '/') reqPath = '/index.html';
+  if (reqPath === '/stats') reqPath = '/stats.json';
 
   const filePath = path.join(__dirname, reqPath);
 
