@@ -247,81 +247,140 @@
     .club-gallery-title {
       margin: 0 0 14px;
       color: var(--text-primary, #0A1628);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      font-weight: 700;
       text-align: center;
+      letter-spacing: -0.01em;
     }
     .club-gallery-slideshow {
       position: relative;
       overflow: hidden;
-      border-radius: 16px;
+      border-radius: 18px;
       background: #0A1628;
+      box-shadow: 0 10px 30px rgba(10, 22, 40, 0.22);
+      max-width: 460px;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+    }
+    .club-gallery-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #F59E0B, #1A50BF);
+      z-index: 10;
+      transition: width 0.1s linear;
     }
     .club-gallery-slide {
+      position: absolute;
+      inset: 0;
       margin: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.04);
+      transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.65s;
+      z-index: 1;
     }
-    .club-gallery-slide[hidden] {
-      display: none;
+    .club-gallery-slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      z-index: 2;
     }
     .club-gallery-slide img {
       display: block;
       width: 100%;
-      height: clamp(240px, 48vw, 420px);
+      height: 100%;
       object-fit: cover;
+      user-select: none;
+      -webkit-user-drag: none;
     }
     .club-gallery-caption {
-      padding: 10px 14px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 18px 12px;
       color: #fff;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 500;
       text-align: center;
-      background: linear-gradient(transparent, rgba(10,22,40,0.96));
+      background: linear-gradient(to top, rgba(10,22,40,0.95) 0%, rgba(10,22,40,0.5) 60%, transparent 100%);
+      z-index: 3;
+    }
+    .club-gallery-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(10, 22, 40, 0.55);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+    .club-gallery-nav-btn:hover {
+      background: var(--primary, #1A50BF);
+      border-color: var(--primary, #1A50BF);
+      transform: translateY(-50%) scale(1.08);
+    }
+    .club-gallery-nav-btn:focus-visible,
+    .club-gallery-dot:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+    .club-gallery-nav-btn.prev {
+      left: 12px;
+    }
+    .club-gallery-nav-btn.next {
+      right: 12px;
     }
     .club-gallery-controls {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 14px;
-      margin-top: 12px;
-    }
-    .club-gallery-arrow,
-    .club-gallery-dot {
-      border: 0;
-      cursor: pointer;
-    }
-    .club-gallery-arrow {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      color: #fff;
-      background: var(--primary, #1A50BF);
-      font-size: 1.25rem;
-    }
-    .club-gallery-arrow:focus-visible,
-    .club-gallery-dot:focus-visible {
-      outline: 3px solid #f59e0b;
-      outline-offset: 3px;
+      margin-top: 14px;
     }
     .club-gallery-position {
-      min-width: 44px;
+      min-width: 48px;
       color: var(--text-secondary, #64748b);
       font-size: 0.85rem;
+      font-weight: 600;
       text-align: center;
     }
     .club-gallery-dots {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 8px;
       margin-top: 10px;
     }
     .club-gallery-dot {
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
       padding: 0;
-      border-radius: 50%;
+      border: 0;
+      border-radius: 5px;
       background: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
     .club-gallery-dot[aria-current="true"] {
       background: var(--primary, #1A50BF);
-      transform: scale(1.25);
+      width: 24px;
+      border-radius: 6px;
     }
     .celebration-icon {
       display: flex;
@@ -548,28 +607,47 @@
 
         <section class="club-gallery" aria-label="Dhruva Club photo gallery">
           <h3 class="club-gallery-title">A glimpse of Dhruva Club</h3>
-          <div class="club-gallery-slideshow" id="clubGallerySlideshow" aria-roledescription="carousel">
+          <div class="club-gallery-slideshow" id="clubGallerySlideshow" aria-roledescription="carousel" tabindex="0">
+            <div class="club-gallery-progress" id="galleryProgress"></div>
+            <figure class="club-gallery-slide active">
+              <img src="assets/8.png" alt="Dhruva Club - Character (Behaviour, Attitude, Ethics, Qualities)" loading="lazy">
+              <figcaption class="club-gallery-caption">Character: Behaviour · Attitude · Ethics · Qualities</figcaption>
+            </figure>
             <figure class="club-gallery-slide">
-              <img src="assets/club-gallery-hike.png" alt="Dhruva Club students enjoying a group hike" loading="lazy">
-              <figcaption class="club-gallery-caption">Growing together through shared experiences</figcaption>
+              <img src="assets/9.png" alt="Dhruva Club - Competence (Knowledge, Communication, Talent, Skills)" loading="lazy">
+              <figcaption class="club-gallery-caption">Competence: Knowledge · Communication · Talent · Skills</figcaption>
             </figure>
-            <figure class="club-gallery-slide" hidden>
-              <img src="assets/club-gallery-fields.png" alt="Green fields during a Dhruva Club outing" loading="lazy">
-              <figcaption class="club-gallery-caption">Finding space to reflect and recharge</figcaption>
+            <figure class="club-gallery-slide">
+              <img src="assets/10.png" alt="Dhruva Club - Culture (Principles, Habits, Cultivation, Association)" loading="lazy">
+              <figcaption class="club-gallery-caption">Culture: Principles · Habits · Cultivation · Association</figcaption>
             </figure>
-            <figure class="club-gallery-slide" hidden>
-              <img src="assets/club-gallery-team.png" alt="Dhruva Club members together outdoors" loading="lazy">
-              <figcaption class="club-gallery-caption">The Dhruva Club community</figcaption>
+            <figure class="club-gallery-slide">
+              <img src="assets/18.png" alt="Dhruva Club - Edutainment Outings" loading="lazy">
+              <figcaption class="club-gallery-caption">Edutainment Outings & Adventures</figcaption>
             </figure>
+            <figure class="club-gallery-slide">
+              <img src="assets/19.png" alt="Dhruva Club - Personality Development Workshops" loading="lazy">
+              <figcaption class="club-gallery-caption">Personality Development Workshops</figcaption>
+            </figure>
+            <figure class="club-gallery-slide">
+              <img src="assets/20.png" alt="Dhruva Club - Wisdom Sessions" loading="lazy">
+              <figcaption class="club-gallery-caption">Wisdom Sessions & Mentor Guidance</figcaption>
+            </figure>
+            <button type="button" class="club-gallery-nav-btn prev" id="galleryPrevious" aria-label="Previous photo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <button type="button" class="club-gallery-nav-btn next" id="galleryNext" aria-label="Next photo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
           <div class="club-gallery-controls">
-            <button type="button" class="club-gallery-arrow" id="galleryPrevious" aria-label="Previous photo">‹</button>
-            <span class="club-gallery-position" id="galleryPosition" aria-live="polite">1 / 3</span>
-            <button type="button" class="club-gallery-arrow" id="galleryNext" aria-label="Next photo">›</button>
-          </div>
-          <div class="club-gallery-dots" id="clubGalleryDots" aria-label="Choose a photo"></div>
-          <div style="text-align:center;margin-top:10px;">
-            <button type="button" class="btn btn-secondary" id="galleryPause" aria-pressed="false">Pause slideshow</button>
+            <span class="club-gallery-position" id="galleryPosition" aria-live="polite">1 / 6</span>
+            <div class="club-gallery-dots" id="clubGalleryDots" aria-label="Choose a photo"></div>
+            <button type="button" class="btn btn-secondary" id="galleryPause" aria-pressed="false" style="padding: 6px 14px; font-size: 0.8rem;">Pause slideshow</button>
           </div>
         </section>
 
@@ -602,53 +680,145 @@
         const dotsContainer = document.getElementById("clubGalleryDots");
         const position = document.getElementById("galleryPosition");
         const pauseButton = document.getElementById("galleryPause");
+        const progressBar = document.getElementById("galleryProgress");
         let activeSlide = 0;
-        let timer;
+        let timer = null;
+        let progressInterval = null;
+        let progressPercent = 0;
+        const slideDuration = 4500;
         let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         function showSlide(index) {
           activeSlide = (index + slides.length) % slides.length;
           slides.forEach((slide, slideIndex) => {
-            slide.hidden = slideIndex !== activeSlide;
+            if (slideIndex === activeSlide) {
+              slide.classList.add("active");
+            } else {
+              slide.classList.remove("active");
+            }
           });
-          Array.from(dotsContainer.children).forEach((dot, dotIndex) => {
-            dot.setAttribute("aria-current", String(dotIndex === activeSlide));
-          });
-          position.textContent = `${activeSlide + 1} / ${slides.length}`;
-        }
-
-        slides.forEach((_, index) => {
-          const dot = document.createElement("button");
-          dot.type = "button";
-          dot.className = "club-gallery-dot";
-          dot.setAttribute("aria-label", `Show photo ${index + 1}`);
-          dot.addEventListener("click", () => showSlide(index));
-          dotsContainer.appendChild(dot);
-        });
-
-        function updateAutoplay() {
-          window.clearInterval(timer);
-          if (!paused) {
-            timer = window.setInterval(() => showSlide(activeSlide + 1), 5000);
+          if (dotsContainer) {
+            Array.from(dotsContainer.children).forEach((dot, dotIndex) => {
+              dot.setAttribute("aria-current", String(dotIndex === activeSlide));
+            });
           }
-          pauseButton.textContent = paused ? "Play slideshow" : "Pause slideshow";
-          pauseButton.setAttribute("aria-pressed", String(paused));
+          if (position) position.textContent = `${activeSlide + 1} / ${slides.length}`;
+          resetProgress();
         }
 
-        document.getElementById("galleryPrevious").addEventListener("click", () => showSlide(activeSlide - 1));
-        document.getElementById("galleryNext").addEventListener("click", () => showSlide(activeSlide + 1));
-        pauseButton.addEventListener("click", () => {
-          paused = !paused;
-          updateAutoplay();
+        if (dotsContainer) {
+          slides.forEach((_, index) => {
+            const dot = document.createElement("button");
+            dot.type = "button";
+            dot.className = "club-gallery-dot";
+            dot.setAttribute("aria-label", `Show photo ${index + 1}`);
+            dot.addEventListener("click", () => {
+              showSlide(index);
+              restartAutoplay();
+            });
+            dotsContainer.appendChild(dot);
+          });
+        }
+
+        function resetProgress() {
+          progressPercent = 0;
+          if (progressBar) progressBar.style.width = "0%";
+        }
+
+        function startProgress() {
+          clearInterval(progressInterval);
+          if (paused) return;
+          const stepMs = 50;
+          const stepPercent = (stepMs / slideDuration) * 100;
+          progressInterval = setInterval(() => {
+            progressPercent += stepPercent;
+            if (progressBar) progressBar.style.width = `${Math.min(progressPercent, 100)}%`;
+            if (progressPercent >= 100) {
+              clearInterval(progressInterval);
+            }
+          }, stepMs);
+        }
+
+        function restartAutoplay() {
+          clearInterval(timer);
+          clearInterval(progressInterval);
+          if (!paused) {
+            startProgress();
+            timer = setInterval(() => {
+              showSlide(activeSlide + 1);
+              startProgress();
+            }, slideDuration);
+          }
+          if (pauseButton) {
+            pauseButton.textContent = paused ? "Play slideshow" : "Pause slideshow";
+            pauseButton.setAttribute("aria-pressed", String(paused));
+          }
+        }
+
+        const prevBtn = document.getElementById("galleryPrevious");
+        const nextBtn = document.getElementById("galleryNext");
+        if (prevBtn) {
+          prevBtn.addEventListener("click", () => {
+            showSlide(activeSlide - 1);
+            restartAutoplay();
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener("click", () => {
+            showSlide(activeSlide + 1);
+            restartAutoplay();
+          });
+        }
+        if (pauseButton) {
+          pauseButton.addEventListener("click", () => {
+            paused = !paused;
+            restartAutoplay();
+          });
+        }
+
+        // Touch swipe gestures
+        let touchStartX = 0;
+        let touchEndX = 0;
+        gallery.addEventListener("touchstart", (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        gallery.addEventListener("touchend", (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          if (touchStartX - touchEndX > 50) {
+            showSlide(activeSlide + 1);
+            restartAutoplay();
+          } else if (touchEndX - touchStartX > 50) {
+            showSlide(activeSlide - 1);
+            restartAutoplay();
+          }
+        }, { passive: true });
+
+        // Keyboard arrow navigation
+        gallery.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowLeft") {
+            showSlide(activeSlide - 1);
+            restartAutoplay();
+          } else if (e.key === "ArrowRight") {
+            showSlide(activeSlide + 1);
+            restartAutoplay();
+          }
         });
-        gallery.addEventListener("mouseenter", () => window.clearInterval(timer));
-        gallery.addEventListener("mouseleave", updateAutoplay);
-        gallery.addEventListener("focusin", () => window.clearInterval(timer));
-        gallery.addEventListener("focusout", event => {
-          if (!gallery.contains(event.relatedTarget)) updateAutoplay();
+
+        gallery.addEventListener("mouseenter", () => {
+          clearInterval(timer);
+          clearInterval(progressInterval);
         });
+        gallery.addEventListener("mouseleave", restartAutoplay);
+        gallery.addEventListener("focusin", () => {
+          clearInterval(timer);
+          clearInterval(progressInterval);
+        });
+        gallery.addEventListener("focusout", (event) => {
+          if (!gallery.contains(event.relatedTarget)) restartAutoplay();
+        });
+
         showSlide(0);
-        updateAutoplay();
+        restartAutoplay();
       }
 
       if (resultBadge) resultBadge.textContent = resultConf.badge || "Evaluation Complete";
