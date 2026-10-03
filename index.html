@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Dhruva Club — Personality & Aptitude Assessment (PQ IQ SQ)</title>
+
+  <!-- SEO & Social Meta -->
+  <meta name="description"
+    content="Official Dhruva Club Personality Development, Physical, Intellectual, and Spiritual Quotient (PQ-IQ-SQ) Assessment for Engineering Students.">
+  <meta name="theme-color" content="#0A1628">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Firebase Compatibility SDK via CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- Header & Brand Section -->
+    <header class="brand-header" id="brandHeader">
+      <div class="header-top">
+        <div class="brand-logo-wrap">
+          <img src="assets/logo.png" alt="Dhruva Club Logo" class="brand-logo" id="clubLogo"
+            onerror="this.style.display='none'">
+        </div>
+      </div>
+
+      <div class="brand-badge" id="clubBadge">Official Assessment</div>
+      <h1 class="brand-title" id="clubName">Dhruva Club</h1>
+      <p class="brand-tagline" id="clubTagline">Personality Development, Character Building & Aptitude Assessment</p>
+      <p class="brand-tagline">PQ-IQ-SQ Assessment</p>
+
+      <!-- Compact Collapsible About Section -->
+      <div class="about-accordion">
+        <button type="button" class="about-toggle-btn" id="aboutToggleBtn" aria-expanded="false">
+          <span>About Dhruva Club</span>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="about-content" id="aboutContent">
+          <div class="about-inner">
+            <p class="about-lead" id="aboutShortDesc"></p>
+            <div class="pillars-grid" id="aboutPillars">
+              <!-- Dynamically populated from content.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stepper Progress Tracker -->
+    <section class="stepper-container" aria-label="Assessment Progress">
+      <div class="stepper-header">
+        <span class="step-count-label" id="stepCountLabel">Step 1 of 5</span>
+        <span class="step-percent-label" id="stepPercentLabel">0% Completed</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="step-dots" id="stepDotsContainer">
+        <!-- Dynamically populated step dots -->
+      </div>
+    </section>
+
+    <!-- Main Dynamic Form Card -->
+    <main class="form-card" id="formCard">
+      <form id="assessmentForm" novalidate>
+        <div id="stepsContainer">
+          <!-- Step Views dynamically rendered from content.js -->
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="form-navigation">
+          <button type="button" class="btn btn-secondary" id="prevBtn" style="visibility: hidden;">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Previous</span>
+          </button>
+
+          <button type="button" class="btn btn-primary" id="nextBtn">
+            <span class="btn-text">Continue</span>
+            <span class="spinner" aria-hidden="true"></span>
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-text">
+      <p>&copy; 2026 Dhruva Club. All rights reserved. Cultivating Character, Competence & Culture.</p>
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/security.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

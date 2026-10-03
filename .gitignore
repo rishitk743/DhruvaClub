@@ -1,0 +1,4 @@
+# Keep credentials out of version control
+js/firebase-config.js
+.env
+.env.local
